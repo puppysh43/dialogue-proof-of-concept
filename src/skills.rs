@@ -1,3 +1,6 @@
+/*
+
+
 use std::collections::HashMap;
 ///Component that holds all of the known skills a character has
 pub struct Skills {
@@ -193,3 +196,4 @@ pub fn roll_3d6(boon_or_bane: BoonOrBane) -> i32 {
         BoonOrBane::Boon => raw_roll.iter().sum::<i32>() - raw_roll.iter().min().unwrap(),
     }
 }
+*/

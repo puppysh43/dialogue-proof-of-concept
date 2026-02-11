@@ -72,6 +72,10 @@ impl DialogueTree {
         }
         first_node
     }
+    ///gets the name of the NPC in the dialogue tree
+    pub fn name(&self) -> String {
+        self.name.clone()
+    }
 }
 ///function pointer for any function that references the gamestate for any kind of condition and returns a boolean operator
 pub type VisibilityCheck = fn(&GameState) -> bool;

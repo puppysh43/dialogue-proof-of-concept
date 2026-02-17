@@ -25,7 +25,37 @@ impl QuestDB {
 
 #[derive(Clone, Debug)]
 pub struct QuestTree {
-    nodes: HashMap<String, QuestNode>,
+    ///quest name
+    name: String,
+    tree: HashMap<String, QuestNode>,
+}
+impl QuestTree {
+    pub fn new(name: String) -> Self {
+        let tree: HashMap<String, QuestNode> = HashMap::new();
+        QuestTree { name, tree }
+    }
+    ///add a new quest node to the tree
+    pub fn add(&mut self, quest_name: String, new_node: QuestNode) {
+        self.tree.insert(quest_name, new_node);
+    }
+    ///clones out a copy of the requested dialogue node
+    pub fn get(&self, node_name: String) -> QuestNode {
+        self.tree.get(&node_name).unwrap().clone()
+    }
+    ///gets the first node of the quest tree by checking for one without a parent node. should always return something
+    pub fn first_node(&self) -> Option<QuestNode> {
+        let mut first_node: Option<QuestNode> = None;
+        for (_, node) in self.tree.iter() {
+            if node.parent_nodes.is_empty() {
+                first_node = Some(node.clone());
+            }
+        }
+        first_node
+    }
+
+    pub fn name(&self) -> String {
+        self.name.clone()
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -33,4 +63,25 @@ pub struct QuestNode {
     completed: bool,
     parent_nodes: Vec<String>,
     child_nodes: Vec<String>,
+}
+impl QuestNode {
+    pub fn new(parent_nodes: Vec<String>, child_nodes: Vec<String>) -> Self {
+        QuestNode {
+            completed: false,
+            parent_nodes,
+            child_nodes,
+        }
+    }
+
+    pub fn get_parent_nodes(&self) -> Vec<String> {
+        self.parent_nodes.clone()
+    }
+
+    pub fn get_child_nodes(&self) -> Vec<String> {
+        self.child_nodes.clone()
+    }
+    ///marks a quest node as completed
+    pub fn complete(&mut self) {
+        self.completed = true;
+    }
 }

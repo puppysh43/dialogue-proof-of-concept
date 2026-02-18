@@ -30,6 +30,7 @@ pub struct QuestTree {
     tree: HashMap<String, QuestNode>,
 }
 impl QuestTree {
+    ///make new quest tree to be filled
     pub fn new(name: String) -> Self {
         let tree: HashMap<String, QuestNode> = HashMap::new();
         QuestTree { name, tree }
@@ -52,7 +53,7 @@ impl QuestTree {
         }
         first_node
     }
-
+    ///get quest name
     pub fn name(&self) -> String {
         self.name.clone()
     }
@@ -65,6 +66,7 @@ pub struct QuestNode {
     child_nodes: Vec<String>,
 }
 impl QuestNode {
+    ///instantiates a new questnode. quest nodes always start out as false b/c they all need to be started and advanced by player actions.
     pub fn new(parent_nodes: Vec<String>, child_nodes: Vec<String>) -> Self {
         QuestNode {
             completed: false,
@@ -72,11 +74,11 @@ impl QuestNode {
             child_nodes,
         }
     }
-
+    ///clone out list of parent nodes. if the vec of parent nodes is empty it means it's the first node in the quest - almost always the one used to mark the quest as accepted/initiated
     pub fn get_parent_nodes(&self) -> Vec<String> {
         self.parent_nodes.clone()
     }
-
+    ///clone out the list of child nodes, if the vec of child nodes is empty it means it's a terminating node in the quest and marks its completion.
     pub fn get_child_nodes(&self) -> Vec<String> {
         self.child_nodes.clone()
     }

@@ -1,5 +1,6 @@
 use crate::dialogue::*;
 use crate::gamestate::*;
+use crate::quest::*;
 use hecs::*;
 pub fn init_gamestate() -> GameState {
     GameState {
@@ -11,6 +12,7 @@ pub fn init_gamestate() -> GameState {
     }
 }
 
+///in the future this will just load things from a folder of files hopefully.
 fn init_dialogue_db() -> DialogueDB {
     let mut db = DialogueDB::new();
 
@@ -107,4 +109,12 @@ fn init_dialogue_db() -> DialogueDB {
 
     db.add("Humble Farmer".to_string(), humble_farmer);
     db
+}
+
+///currently provides an example questdb for testing and a proof of concept but will eventually
+///just load the questdb from a file possibly produced with my own primitive tooling
+fn init_questdb() -> QuestDB {
+    let mut questdb = QuestDB::new();
+    let mut farmer_persuasion = QuestTree::new("Persuade The Farmer".to_string())
+    
 }

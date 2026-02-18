@@ -1,6 +1,16 @@
+/*
+SCOPE OF PROJECT
+No ECS, no data for NPCs outside of associated dialogue and quests selected from the menu.
+create 1 simple quest one intermediate quest and one more complicated quest
+find way for quest and dialogue data to be loaded from a file instead of being hardcoded as much as possible
+additionally look into making extremely basic proof of concept tooling for creating at LEAST quest db
+player will have inventory for quest items, attributes, and skills, inspired by but pared down from MgT2e
+obviously logic for interfacing with these things will change when added to an actual game especially b/c an ECS is probably
+*/
 pub mod dialogue;
 pub mod gamestate;
 mod init_gamestate;
+pub mod player;
 pub mod quest;
 pub mod skills;
 use dialogue::*;

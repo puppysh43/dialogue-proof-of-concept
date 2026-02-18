@@ -5,6 +5,7 @@ use std::collections::HashMap;
 /*
 CURRENT NOTES AND THOUGHTS
  - uses a lot of unnecessary cloning for fast prototyping should optimize later
+ - maybe make it so various functions take in string literals and turn them into strings so that all values passed in don't need to be appended with .to_string()
 */
 
 ///parent struct that contains all dialogue trees within the game. dialogue trees will be cloned out of the hashmap as needed

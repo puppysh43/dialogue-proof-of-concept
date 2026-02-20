@@ -111,10 +111,12 @@ fn init_dialogue_db() -> DialogueDB {
     db
 }
 
-///currently provides an example questdb for testing and a proof of concept but will eventually
-///just load the questdb from a file possibly produced with my own primitive tooling
+//currently provides an example questdb for testing and a proof of concept but will eventually
+//just load the questdb from a file possibly produced with my own primitive tooling
+/*
 fn init_questdb() -> QuestDB {
     let mut questdb = QuestDB::new();
     let mut farmer_persuasion = QuestTree::new("Persuade The Farmer".to_string())
-    
+
 }
+*/

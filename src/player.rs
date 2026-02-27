@@ -1,11 +1,13 @@
 ///all player information needed for proof of concept and basic testing of functionality. maybe will make configurable via config file.
 use std::collections::HashMap;
+#[derive(Clone, Debug)]
 pub struct Player {
     attributes: Attributes,
     skills: Skills,
     inventory: HashMap<String, Item>,
 }
 
+#[derive(Clone, Debug)]
 pub enum AttributeType {
     Strength,
     Dexterity,
@@ -17,6 +19,7 @@ pub enum AttributeType {
 
 ///contains the attributes of a character. each attribute is a tuple, with the first entry being the max/default set at character creation, and the second being the current
 ///allowing for attribute damage as well as temporary boosts from items or consumables.
+#[derive(Clone, Debug)]
 pub struct Attributes {
     strength: (i32, i32),
     dexterity: (i32, i32),
@@ -45,6 +48,37 @@ impl Attributes {
             AttributeType::Education => self.education.0,
             AttributeType::Charisma => self.charisma.0,
         }
+    }
+    ///gets the bonus a given attribute can contribute to a task check
+    pub fn get_bonus(&self, attribute_type: AttributeType) -> i32 {
+        let val = self.get_current(attribute_type);
+        match val {
+            0 => -3,
+            1..=2 => -2,
+            3..=5 => -1,
+            6..=8 => 0,
+            9..=11 => 1,
+            12..=14 => 2,
+            15.. => 3,
+            _ => 0,
+        }
+    }
+    pub fn full_heal(&mut self) {
+        (
+            self.strength.1,
+            self.dexterity.1,
+            self.endurance.1,
+            self.intellect.1,
+            self.education.1,
+            self.charisma.1,
+        ) = (
+            self.strength.0,
+            self.dexterity.0,
+            self.endurance.0,
+            self.intellect.0,
+            self.education.0,
+            self.charisma.0,
+        );
     }
 }
 /*

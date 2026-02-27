@@ -1,5 +1,5 @@
 use crate::gamestate::*;
-use hecs::*;
+use crate::player::*;
 use std::collections::HashMap;
 
 /*
@@ -78,8 +78,152 @@ impl DialogueTree {
         self.name.clone()
     }
 }
-///function pointer for any function that references the gamestate for any kind of condition and returns a boolean operator
-pub type VisibilityCheck = fn(&GameState) -> bool;
+///type used to specify a quest node with the tree name and node name
+#[derive(Clone, Debug)]
+pub struct QuestNodePath {
+    ///specifies the name of the quest tree needed
+    tree: String,
+    ///specifies the name of the quest node needed in the specified tree
+    node: String,
+}
+impl QuestNodePath {
+    ///creates a new
+    pub fn new(tree: String, node: String) -> QuestNodePath {
+        QuestNodePath { tree, node }
+    }
+    pub fn path(&self) -> (String, String) {
+        (self.tree.clone(), self.node.clone())
+    }
+    pub fn tree(&self) -> String {
+        self.tree.clone()
+    }
+    pub fn node(&self) -> String {
+        self.node.clone()
+    }
+}
+
+#[derive(Clone, Debug)]
+pub enum VisibilityConditions {
+    QuestStage(QuestNodePath),
+}
+///used for choice and consequence reactivity in the RPG sense. the choice is the test that will be performed
+///ex. (checking a quest stage, doing a skill check, checking for an item) and the consequences are event flags for worldstate changes
+///to do based on the result of the choice
+#[derive(Clone, Debug)]
+pub struct CheckAndConsequences {
+    ///enum flag that tells the dialogue processing system what kind of checks need to be completed ex. skill check, checking a quest stage, faction reputation, etc
+    check: CheckType,
+    ///container for a vec of consequences for both success and failure (ex. when making a strength check to move a boulder, success clears the boulder and changes the associated quest
+    ///so the play can pass through, on failure the character takes damage)
+    consequences: Consequences,
+}
+///the difficulty of a task check, translates into a target number that the character needs to roll at or over to succeed
+#[derive(Clone, Debug)]
+pub enum CheckDifficulty {
+    ///target number of 2 or more
+    Simple,
+    ///target number of 4 or more
+    Easy,
+    ///target number of 6 or more
+    Rotuine,
+    ///target number of 8 or more
+    Average,
+    ///target number of 10 or more
+    Difficult,
+    ///target number of 12 or more
+    VeryDifficult,
+    ///target number of 14 or more
+    Formidable,
+    ///target number of 16 or more
+    Impossible,
+}
+///specifications used to tell what kind of skillcheck it is - what skill and/or attribute is being tested, and if item bonuses can be used. If no skilltype or attributetype is specified for the check
+///it will do an agnostic skillcheck, essentially a random diceroll of average difficulty
+///defined at creation and completely immutable after, will copy or clone out various fields as needed for the dialogue parsing and skillcheck system
+#[derive(Clone, Debug)]
+pub struct TaskCheckSpecifications {
+    ///if the test has a checkpoint option or not. most checks will have a bonus level at which no dice roll needs to be made (ex. if athletics lvl = 1 check automatically succeeds)
+    ///if the checkpoint is NOT reached then the player can still attempt the check as a diceroll. Both attributes and skills can contribute to reaching the checkpoint
+    checkpoint: Option<i32>,
+    ///specifies what skilltype is able to lend a bonus to the task check, if any
+    skill_bonus: Option<SkillType>,
+    ///specified what attribute type is able to lend a bonus to the task check, if any
+    attribute_bonus: Option<AttributeType>,
+    ///flags if item bonuses are applicable to this check ex. a mechanics toolkit that adds +1 to all repair checks
+    item_bonus: bool,
+    ///custom check difficulty. if one isn't given/field = none then it will do an average difficulty check
+    difficulty: Option<CheckDifficulty>,
+}
+impl TaskCheckSpecifications {
+    ///creates a new TaskCheckSpecifications for defining a task check in dialogues.
+    pub fn new(
+        checkpoint: Option<i32>,
+        skill_bonus: Option<SkillType>,
+        attribute_bonus: Option<AttributeType>,
+        item_bonus: bool,
+        difficulty: Option<CheckDifficulty>,
+    ) -> TaskCheckSpecifications {
+        TaskCheckSpecifications {
+            checkpoint,
+            skill_bonus,
+            attribute_bonus,
+            item_bonus,
+            difficulty,
+        }
+    }
+    pub fn checkpoint(&self) -> Option<i32> {
+        self.checkpoint
+    }
+    pub fn skill_bonus(&self) -> Option<SkillType> {
+        self.skill_bonus.clone()
+    }
+    pub fn attribute_bonus(&self) -> Option<AttributeType> {
+        self.attribute_bonus.clone()
+    }
+    pub fn item_bonus(&self) -> bool {
+        self.item_bonus
+    }
+    pub fn difficulty(&self) -> Option<CheckDifficulty> {
+        self.difficulty.clone()
+    }
+}
+///Flag for what kind of gamestate check is going to be performed by the dialogue node.
+#[derive(Clone, Debug)]
+pub enum CheckType {
+    ///a task check, more commonly known in other games as a skill check. For more details on what exactly this entails see the documentation for TaskCheckSpecifications.
+    TaskCheck(TaskCheckSpecifications),
+    ///checks if a player has an item in their inventory.
+    ItemCheck(String),
+    ///checks if a quest stage has been completed given the path of a quest stage (ex. the tree name and node name)
+    QuestStageCheck(QuestNodePath),
+}
+///container for a vec of consequences for both success and failure (ex. when making a strength check to move a boulder, success clears the boulder and changes the associated quest
+///so the play can pass through, on failure the character takes damage) Also contains the ID of the node in the quest tree that a success or failure will send you to.
+#[derive(Clone, Debug)]
+pub struct Consequences {
+    ///contains a vector of variable size of consequences (gamestate changes) to be processed when the player succeeds the check as well as the ID of the dialogue node to route to depending on results
+    success: (Vec<Consequence>, String),
+    ///contains a vector of variable size of consequences (gamestate changes) to be processed when the player fails the check as well as the ID of the dialogue node to route to depending on results
+    failure: (Vec<Consequence>, String),
+}
+///event flag to tell the game what gamestate changes to make based on the result of the choice/check.
+#[derive(Clone, Debug)]
+pub enum Consequence {
+    ///damage the player by the amount specified
+    DamagePlayer(i32),
+    //put an item in the player's inventory given the name/ID of the item as a string (currently not functional in the prototype due to how items are handled)
+    // GivePlayerItem(String),
+    ///give the player an item. includes the ID to use as the key in the hashmap as well as the Item struct
+    GivePlayerItem(String, Item),
+    ///remove an item from the player's inventory given the ItemID (string) specified in the flag
+    RemoveItem(String),
+    ///flag with a path to a quest node that the dialogue processing system will mark as completed
+    CompleteQuestStage(QuestNodePath),
+    //used later/example of future possibilites, will raise the faction reputation by a specified amount according to the FactionID (string for now)
+    // RaiseReputation(String, i32),
+    ///flag for any complicated or unique consequences of dialogue. the string will need to be hard coded to a function in the custom flag parsing system.
+    Custom(String),
+}
 
 ///individual node that makes up dialogue trees. contains the previous dialogue option, the possible dialogue options
 ///the text printed to the screen, as well as gameplay features; a requirement for visibility, a worldstate check
@@ -98,11 +242,9 @@ pub struct DialogueNode {
     ///an optional requirement that must be met for the option to be visible. this is to prevent for example the PC from
     ///seeing an option to say they're going to return a quest item when it is not in their inventory, or from seeing
     ///dialogue related to a quest they haven't progressed to yet.
-    visibility_req: Option<VisibilityCheck>,
-    ///this is a generic container for dialogues that rely on changing the worldstate. for example, a simple speech check would
-    ///use this field to run a skill check against the player's speech skill. depending on success or failure a different quest
-    ///flag would be marked, which would then is parsed by visibility_req to ensure the PC sees the appropriate response
-    worldstate_changes: Option<fn(&mut GameState)>,
+    visibility_req: Option<VisibilityConditions>,
+    ///the "choice and consequences field" aka the list of various flags needed to parse out a choice/check
+    cnc: Option<CheckAndConsequences>,
 }
 impl DialogueNode {
     ///Creates a new dialogue node
@@ -111,8 +253,8 @@ impl DialogueNode {
         npc_text: String,
         parent_node: Vec<String>,
         child_nodes: Vec<String>,
-        visibility_req: Option<VisibilityCheck>,
-        worldstate_changes: Option<fn(&mut GameState)>,
+        visibility_req: Option<VisibilityConditions>,
+        cnc: Option<CheckAndConsequences>,
     ) -> Self {
         DialogueNode {
             player_text,
@@ -120,7 +262,7 @@ impl DialogueNode {
             parent_node,
             child_nodes,
             visibility_req,
-            worldstate_changes,
+            cnc,
         }
     }
     ///clones out the player text
@@ -141,11 +283,11 @@ impl DialogueNode {
     }
     ///clones out an option that will contain the visibility check if it has one so that it can be run on the gamestate
     ///and a boolean produced when the game needs to decide what dialogue options to show
-    pub fn visibility_req(&self) -> Option<VisibilityCheck> {
+    pub fn visibility_req(&self) -> Option<VisibilityConditions> {
         self.visibility_req.clone()
     }
     ///clones out an option containing the gamestate changes if present so that they can be run on the gamestate
-    pub fn gamestate_changes(&self) -> Option<fn(&mut GameState)> {
-        self.worldstate_changes.clone()
+    pub fn checks_and_consequences(&self) -> Option<CheckAndConsequences> {
+        self.cnc.clone()
     }
 }

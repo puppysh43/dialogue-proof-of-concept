@@ -20,6 +20,9 @@ impl QuestDB {
     pub fn get(&self, tree_name: String) -> QuestTree {
         self.db.get(&tree_name).unwrap().clone()
     }
+    pub fn get_from_path(&self, path: (String, String)) -> QuestNode {
+        self.db.get(&path.0).unwrap().get(path.1).clone()
+    }
 }
 //
 
@@ -36,8 +39,8 @@ impl QuestTree {
         QuestTree { name, tree }
     }
     ///add a new quest node to the tree
-    pub fn add(&mut self, quest_name: String, new_node: QuestNode) {
-        self.tree.insert(quest_name, new_node);
+    pub fn add(&mut self, node_name: String, new_node: QuestNode) {
+        self.tree.insert(node_name, new_node);
     }
     ///clones out a copy of the requested dialogue node
     pub fn get(&self, node_name: String) -> QuestNode {

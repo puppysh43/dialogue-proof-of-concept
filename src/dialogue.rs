@@ -103,8 +103,14 @@ impl QuestNodePath {
 }
 
 #[derive(Clone, Debug)]
+///flag that determines if a given dialogue node can be shown.
 pub enum VisibilityConditions {
+    ///marks that a dialogue option can only be visible if the specified quest node is marked as completed
     QuestStage(QuestNodePath),
+    ///marks that a dialogue option can only be visible if the player has a minimum level in the specified skill
+    SkillMinumum(SkillType, i32),
+    ///marks that a dialogue option can only be visible if the player has a minimum level in the specified attribute
+    AttributeMinimum(AttributeType, i32),
 }
 ///used for choice and consequence reactivity in the RPG sense. the choice is the test that will be performed
 ///ex. (checking a quest stage, doing a skill check, checking for an item) and the consequences are event flags for worldstate changes
@@ -205,6 +211,20 @@ pub struct Consequences {
     success: (Vec<Consequence>, String),
     ///contains a vector of variable size of consequences (gamestate changes) to be processed when the player fails the check as well as the ID of the dialogue node to route to depending on results
     failure: (Vec<Consequence>, String),
+}
+impl Consequences {
+    pub fn new(
+        success: (Vec<Consequence>, String),
+        failure: (Vec<Consequence>, String),
+    ) -> Consequences {
+        Consequences { success, failure }
+    }
+    pub fn success(&self) -> (Vec<Consequence>, String) {
+        self.success.clone()
+    }
+    pub fn failure(&self) -> (Vec<Consequence>, String) {
+        self.failure.clone()
+    }
 }
 ///event flag to tell the game what gamestate changes to make based on the result of the choice/check.
 #[derive(Clone, Debug)]

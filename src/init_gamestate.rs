@@ -8,6 +8,7 @@ pub fn init_gamestate() -> GameState {
         dialogue_db: init_dialogue_db(),
         current_dialogue_tree: None,
         current_dialogue_node: None,
+        questdb: init_quest_db(),
         quitting: false,
     }
 }
@@ -113,10 +114,13 @@ fn init_dialogue_db() -> DialogueDB {
 
 //currently provides an example questdb for testing and a proof of concept but will eventually
 //just load the questdb from a file possibly produced with my own primitive tooling
-/*
-fn init_questdb() -> QuestDB {
+fn init_quest_db() -> QuestDB {
     let mut questdb = QuestDB::new();
-    let mut farmer_persuasion = QuestTree::new("Persuade The Farmer".to_string())
-
+    let mut farmer_persuasion = QuestTree::new("Persuade The Farmer".to_string());
+    farmer_persuasion.add(
+        "SomethingToHide".to_string(),
+        QuestNode::new(Vec::new(), Vec!["PersuadeTheFarmer".to_string(),"TalkToShopkeeper".to_string()]),
+    );
+    farmer_persuasion.add
+    questdb
 }
-*/

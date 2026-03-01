@@ -66,9 +66,20 @@ fn progress_tree(gamestate: &mut GameState) {
             .unwrap()
             .get(key.clone());
         match temp_node.visibility_req() {
-            Some(_vis_check) => {
+            Some(vis_check) => {
                 //if it does have a visibility requirement it needs to be run and determined if the dialogue option can be chosen.
                 //but I'm not gonna implement that teehee
+                match vis_check {
+                    VisibilityConditions::QuestStage(quest_node_path) => {
+                        gamestate.
+                    }
+                    VisibilityConditions::SkillMinumum(skilltype, level) => {
+                        
+                    }
+                    VisibilityConditions::AttributeMinimum(attributetype, i32) => {
+                        
+                    }
+                }
             }
             None => {
                 visible_keys.push(key.clone());

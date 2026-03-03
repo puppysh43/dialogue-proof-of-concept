@@ -213,15 +213,18 @@ pub struct Consequences {
     failure: (Vec<Consequence>, String),
 }
 impl Consequences {
+    ///creates a new set of consequences for a task check
     pub fn new(
         success: (Vec<Consequence>, String),
         failure: (Vec<Consequence>, String),
     ) -> Consequences {
         Consequences { success, failure }
     }
+    ///provides the relevant consequence flags and ID for the proceeding dialogue node if the player succeeds the task check
     pub fn success(&self) -> (Vec<Consequence>, String) {
         self.success.clone()
     }
+    ///provides the relevant consequence flags and ID for the proceeding dialogue node if the player fails the task check
     pub fn failure(&self) -> (Vec<Consequence>, String) {
         self.failure.clone()
     }

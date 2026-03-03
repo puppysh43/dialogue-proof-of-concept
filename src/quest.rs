@@ -89,4 +89,7 @@ impl QuestNode {
     pub fn complete(&mut self) {
         self.completed = true;
     }
+    pub fn status(&self) -> bool {
+        self.completed
+    }
 }

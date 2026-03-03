@@ -1,14 +1,17 @@
 use crate::dialogue::*;
 use crate::gamestate::*;
+use crate::player::*;
 use crate::quest::*;
 use hecs::*;
+use std::collections::HashMap;
 pub fn init_gamestate() -> GameState {
     GameState {
         world: World::new(),
         dialogue_db: init_dialogue_db(),
         current_dialogue_tree: None,
         current_dialogue_node: None,
-        questdb: init_quest_db(),
+        quest_db: init_quest_db(),
+        player: init_player(),
         quitting: false,
     }
 }
@@ -119,8 +122,27 @@ fn init_quest_db() -> QuestDB {
     let mut farmer_persuasion = QuestTree::new("Persuade The Farmer".to_string());
     farmer_persuasion.add(
         "SomethingToHide".to_string(),
-        QuestNode::new(Vec::new(), Vec!["PersuadeTheFarmer".to_string(),"TalkToShopkeeper".to_string()]),
+        QuestNode::new(
+            Vec::new(),
+            vec![
+                "PersuadeTheFarmer".to_string(),
+                "TalkToShopkeeper".to_string(),
+            ],
+        ),
     );
-    farmer_persuasion.add
+    // farmer_persuasion.add
     questdb
+}
+
+fn init_player() -> Player {
+    Player::new(
+        Attributes::new(8, 8, 8, 8, 8, 8),
+        Skills::from_skills(vec![
+            (SkillType::Speech, 2),
+            (SkillType::Stealth, 0),
+            (SkillType::Tech, 1),
+            (SkillType::Athletics, 0),
+        ]),
+        HashMap::new(),
+    )
 }

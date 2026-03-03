@@ -65,22 +65,32 @@ fn progress_tree(gamestate: &mut GameState) {
             .as_ref()
             .unwrap()
             .get(key.clone());
+        //check if the dialogue node has a visibility requirement
         match temp_node.visibility_req() {
-            Some(vis_check) => {
-                //if it does have a visibility requirement it needs to be run and determined if the dialogue option can be chosen.
-                //but I'm not gonna implement that teehee
-                match vis_check {
-                    VisibilityConditions::QuestStage(quest_node_path) => {
-                        gamestate.
-                    }
-                    VisibilityConditions::SkillMinumum(skilltype, level) => {
-                        
-                    }
-                    VisibilityConditions::AttributeMinimum(attributetype, i32) => {
-                        
+            //if so then do various gamestate checks depending on the visibility requirement flag
+            Some(vis_check) => match vis_check {
+                VisibilityConditions::QuestStage(quest_node_path) => {
+                    if gamestate
+                        .quest_db
+                        .get_from_path(quest_node_path.path())
+                        .status()
+                    {
+                        visible_keys.push(key.clone());
                     }
                 }
-            }
+                VisibilityConditions::SkillMinumum(skilltype, level) => {
+                    if gamestate.player.skills().get_lvl(skilltype).is_some() {
+                        if gamestate.player.skills().get_lvl(skilltype).unwrap() >= level {
+                            visible_keys.push(key.clone());
+                        }
+                    }
+                }
+                VisibilityConditions::AttributeMinimum(attribute_type, level) => {
+                    if gamestate.player.attributes().get_current(attribute_type) >= level {
+                        visible_keys.push(key.clone());
+                    }
+                }
+            },
             None => {
                 visible_keys.push(key.clone());
             }

@@ -123,6 +123,20 @@ pub struct CheckAndConsequences {
     ///so the play can pass through, on failure the character takes damage)
     consequences: Consequences,
 }
+impl CheckAndConsequences {
+    pub fn new(check: CheckType, consequences: Consequences) -> CheckAndConsequences {
+        CheckAndConsequences {
+            check,
+            consequences,
+        }
+    }
+    pub fn check(&self) -> CheckType {
+        self.check.clone()
+    }
+    pub fn consequences(&self) -> Consequences {
+        self.consequences.clone()
+    }
+}
 ///the difficulty of a task check, translates into a target number that the character needs to roll at or over to succeed
 #[derive(Clone, Debug)]
 pub enum CheckDifficulty {
@@ -142,6 +156,12 @@ pub enum CheckDifficulty {
     Formidable,
     ///target number of 16 or more
     Impossible,
+}
+
+#[derive(Clone, Debug)]
+pub enum CheckResult {
+    Success,
+    Failure,
 }
 ///specifications used to tell what kind of skillcheck it is - what skill and/or attribute is being tested, and if item bonuses can be used. If no skilltype or attributetype is specified for the check
 ///it will do an agnostic skillcheck, essentially a random diceroll of average difficulty

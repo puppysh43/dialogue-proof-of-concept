@@ -201,3 +201,59 @@ fn select_tree(gamestate: &mut GameState) {
         }
     }
 }
+
+fn process_cnc(cnc: CheckAndConsequences, state: &mut GameState) {
+    let check = cnc.check();
+    let mut consequences: (Vec<Consequence>, String) = (Vec::new(), String::new());
+    let mut check_result: Option<CheckResult> = None;
+    //use a match statement to process the various checks and see which set of consequences need to be carried out
+    match check {
+        CheckType::TaskCheck(task_check) => {
+            //
+        }
+        CheckType::ItemCheck(item) => {
+            if state.player.inventory().contains_key(&item) {
+                check_result = Some(CheckResult::Success);
+            } else {
+                check_result = Some(CheckResult::Failure);
+            }
+        }
+        CheckType::QuestStageCheck(path) => {
+            if state.quest_db.get_from_path(path.path()).status() == true {
+                check_result = Some(CheckResult::Success);
+            } else {
+                check_result = Some(CheckResult::Failure);
+            }
+        }
+    }
+    //depending on the result of the check prep the consequences buffer to iterate through
+    match check_result.unwrap() {
+        CheckResult::Success => {
+            consequences = cnc.consequences().success();
+        }
+        CheckResult::Failure => {
+            consequences = cnc.consequences().failure();
+        }
+    }
+    for consequence in consequences.0 {
+        match consequence {
+            Consequence::DamagePlayer(dmg) => {
+                //do this later once the damage attributes function is working.
+            }
+            Consequence::GivePlayerItem(id, item) => {
+                state.player.add_item(id, item);
+            }
+            Consequence::RemoveItem(id) => {
+                state.player.remove_item(id);
+            }
+            Consequence::CompleteQuestStage(path) => {
+                state.quest_db.get_from_path(path.path()).complete();
+            }
+            Consequence::Custom(_custom_id) => {
+                //currently unused, in the future there will be another match statement that parses the
+                //custom id into a bespoke function for altering the gamestate. Used as a catchall for when
+                //a more complicated or unique consequence is needed thats not worth making an enum flag for
+            }
+        }
+    }
+}

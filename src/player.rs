@@ -31,6 +31,9 @@ impl Player {
     pub fn add_item(&mut self, id: String, item: Item) {
         self.inventory.insert(id, item);
     }
+    pub fn remove_item(&mut self, id: String) {
+        self.inventory.remove(&id);
+    }
 }
 
 ///enum used for specifying the attribute in various functions.

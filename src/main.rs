@@ -7,6 +7,11 @@ additionally look into making extremely basic proof of concept tooling for creat
 player will have inventory for quest items, attributes, and skills, inspired by but pared down from MgT2e
 obviously logic for interfacing with these things will change when added to an actual game especially b/c an ECS is probably
 */
+//in order of importance
+//TODO create test dialogue that makes sure all skillcheck and dialogue tree functionality is working
+//TODO clean up how dialogue is handled and retrieved so that it universally uses a path and maybe get rid of the extraneous current tree and current node variable
+//TODO make an actual system for loading dialogue as data files
+//TODO allow an alternate mode that acts as an editor for dialogue to make testing
 pub mod dialogue;
 pub mod gamestate;
 mod init_gamestate;
@@ -14,9 +19,12 @@ pub mod player;
 pub mod quest;
 pub mod skills;
 use dialogue::*;
+use fastrand;
 use gamestate::*;
 use hecs::*;
 use std::io;
+
+use crate::player::Player;
 
 fn main() {
     let mut gamestate = init_gamestate::init_gamestate();
@@ -209,7 +217,12 @@ fn process_cnc(cnc: CheckAndConsequences, state: &mut GameState) {
     //use a match statement to process the various checks and see which set of consequences need to be carried out
     match check {
         CheckType::TaskCheck(task_check) => {
-            //
+            let result = process_taskcheck(task_check, state.player.clone());
+            if result >= 0 {
+                check_result = Some(CheckResult::Success);
+            } else {
+                check_result = Some(CheckResult::Failure);
+            }
         }
         CheckType::ItemCheck(item) => {
             if state.player.inventory().contains_key(&item) {
@@ -256,4 +269,91 @@ fn process_cnc(cnc: CheckAndConsequences, state: &mut GameState) {
             }
         }
     }
+    //set the active dialogue node with the string specified
+    // maybe look into changing this into a path?
+    state.current_dialogue_node = Some(
+        state
+            .current_dialogue_tree
+            .as_ref()
+            .unwrap()
+            .get(consequences.1),
+    );
+}
+
+///takes in taskcheck specifications and runs them, returning the result of the roll as an integer expressing the difference
+///between the roll and the task check target. a positive is a success, a negative is a failure. in the future the amount of
+///success or failure can be used for degrees of success in special checks
+fn process_taskcheck(specs: TaskCheckSpecifications, player: Player) -> i32 {
+    //TODO it seems like passing the gamestate into the function here is wasteful look at later
+    //first check if its a checkpoint taskcheck, if so just query the relevant player skill level and automatically return a success
+    if specs.checkpoint().is_some() {
+        //query what bonuses are requested by the checkpoint and then get them from the player
+        //first a holder variable for the bonuses/levels that will fail if there's no relevant bonuses
+        let mut player_level: Option<i32> = None;
+        //holds the amount of bonus if one is present
+        let mut bonus: i32 = 0;
+        //if there is a skill bonus find it and add it to the bonus
+        if specs.skill_bonus().is_some() {
+            if player
+                .skills()
+                .get_lvl(specs.skill_bonus().unwrap())
+                .is_some()
+            {
+                bonus += player
+                    .skills()
+                    .get_lvl(specs.skill_bonus().unwrap())
+                    .unwrap();
+                player_level = Some(bonus);
+            }
+        }
+        //if it also takes an attribute bonus then grab the attribute bonus, add it to the bonus, and set the bonus
+        //to the player_level
+        if specs.attribute_bonus().is_some() {
+            bonus += player
+                .attributes()
+                .get_bonus(specs.attribute_bonus().unwrap());
+            player_level = Some(bonus);
+        }
+        //if player level is none that means the player has NO relevant attribute bonuses or skills for the checkpoint
+        //and the checkpoint automatically fails
+        //however if there is an amount of bonuses then we check if the player has met the checkpoint.
+        if player_level.is_some() {
+            if player_level.unwrap() >= specs.checkpoint().unwrap() {
+                return 0;
+            }
+        }
+    }
+    //END CHECKPOINT LOGIC BLOCK
+    //BEGIN REGULAR SKILLCHECK LOGIC BLOCK
+    //if the player cannot meet the checkpoint OR the taskcheck is NOT a checkpoint taskcheck do a regular taskcheck
+    //roll 2d6, add the relevant bonuses, compare it to the check difficulty. return the difference.
+    //initially roll 2d6
+    let mut roll = roll_2d6();
+    //if the taskcheck uses a skillbonus add the skillbonus to the roll
+    if specs.skill_bonus().is_some() {
+        roll += player.skills().get_bonus(specs.skill_bonus().unwrap());
+    }
+    //if the taskcheck uses an attribute bonus add the attribute bonus to the roll
+    if specs.attribute_bonus().is_some() {
+        roll += player
+            .attributes()
+            .get_bonus(specs.attribute_bonus().unwrap());
+    }
+    //this block will be added later and it will query the player inventory for an item with the relevant bonuses
+
+    //set a default check difficulty of 8 in case there isn't one specified
+    let mut check_difficulty = 8;
+    if specs.difficulty().is_some() {
+        //if there is a specified difficulty set the value
+        check_difficulty = specs.difficulty().unwrap().value();
+    }
+    //return the difference between the roll and the check difficulty
+    return roll - check_difficulty;
+}
+///helper function that uses a random number generator to create a simulated d6 roll
+fn roll_d6() -> i32 {
+    fastrand::i32(1..=6)
+}
+fn roll_2d6() -> i32 {
+    fastrand::i32(1..=6) + fastrand::i32(1..=6)
 }

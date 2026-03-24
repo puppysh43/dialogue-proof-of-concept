@@ -145,7 +145,7 @@ pub enum CheckDifficulty {
     ///target number of 4 or more
     Easy,
     ///target number of 6 or more
-    Rotuine,
+    Routine,
     ///target number of 8 or more
     Average,
     ///target number of 10 or more
@@ -156,6 +156,20 @@ pub enum CheckDifficulty {
     Formidable,
     ///target number of 16 or more
     Impossible,
+}
+impl CheckDifficulty {
+    pub fn value(&self) -> i32 {
+        match self {
+            Self::Simple => 2,
+            Self::Easy => 4,
+            Self::Routine => 6,
+            Self::Average => 8,
+            Self::Difficult => 10,
+            Self::VeryDifficult => 12,
+            Self::Formidable => 14,
+            Self::Impossible => 16,
+        }
+    }
 }
 
 #[derive(Clone, Debug)]

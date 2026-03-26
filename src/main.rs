@@ -21,21 +21,35 @@ pub mod skills;
 use dialogue::*;
 use fastrand;
 use gamestate::*;
-use hecs::*;
+// use hecs::*;
+use std::env;
 use std::io;
 
 use crate::player::Player;
 
 fn main() {
-    let mut gamestate = init_gamestate::init_gamestate();
-    //change this to a standalone variable in the main game loop
-    while gamestate.quitting == false {
-        if gamestate.current_dialogue_tree.is_some() {
-            //then parse through the current dialogue tree
-            progress_tree(&mut gamestate);
-        } else if gamestate.current_dialogue_tree.is_none() {
-            //if there is no current dialogue tree then you need to let the player select one
-            select_tree(&mut gamestate);
+    let args: Vec<String> = env::args().collect();
+    let appstate = &args[1].trim();
+    match *appstate {
+        "game" => {
+            //run the game
+            let mut gamestate = init_gamestate::init_gamestate();
+            //change this to a standalone variable in the main game loop
+            while gamestate.quitting == false {
+                if gamestate.current_dialogue_tree.is_some() {
+                    //then parse through the current dialogue tree
+                    progress_tree(&mut gamestate);
+                } else if gamestate.current_dialogue_tree.is_none() {
+                    //if there is no current dialogue tree then you need to let the player select one
+                    select_tree(&mut gamestate);
+                }
+            }
+        }
+        "editor" => {
+            //run the editor
+        }
+        _ => {
+            //print an error message and terminate the program.
         }
     }
 }

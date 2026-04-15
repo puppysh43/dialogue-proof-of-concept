@@ -304,7 +304,15 @@ pub struct DialogueNode {
     cnc: Option<CheckAndConsequences>,
 }
 impl DialogueNode {
-    ///Creates a new dialogue node
+    ///Creates a new dialogue node.
+    ///player text: what the player is saying, this is used when displaying the childnode options.
+    ///npc_text: what the npc is saying, this will display when the node has been chosen
+    ///parent_node: the node that preceded this one. if empty it means it's the initial node
+    ///child nodes: the child nodes aka what dialogue options are available when this one is selected. if empty it's a node that terminates the dialogue
+    ///visibility_req: an optional requirement that must be met for the option to be visible. this is to prevent for example the PC from
+    ///seeing an option to say they're going to return a quest item when it is not in their inventory, or from seeing
+    ///dialogue related to a quest they haven't progressed to yet.
+    ///cnc: the "choice and consequences field" aka the list of various flags needed to parse out a choice/check
     pub fn new(
         player_text: String,
         npc_text: String,

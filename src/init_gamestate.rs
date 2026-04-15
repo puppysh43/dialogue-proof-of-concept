@@ -110,7 +110,9 @@ fn init_dialogue_db() -> DialogueDB {
             ),
         );
     }
-
+    let mut taskchecktest = DialogueTree::new("Task Check Test".to_string());
+    // taskchecktest.add("CheckEntry".to_string(), DialogueNode::new(player_text, npc_text, parent_node, child_nodes, visibility_req, cnc));
+    db.add("Task Check Test".to_string(), taskchecktest);
     db.add("Humble Farmer".to_string(), humble_farmer);
     db
 }

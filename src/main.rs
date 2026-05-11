@@ -7,6 +7,14 @@ additionally look into making extremely basic proof of concept tooling for creat
 player will have inventory for quest items, attributes, and skills, inspired by but pared down from MgT2e
 obviously logic for interfacing with these things will change when added to an actual game especially b/c an ECS is probably
 */
+/*
+EGUI ADDITION
+create a gui for both the gameplay interface and the editor
+will need a minimum window size for both to make sure elements get placed properly
+camera needed for properly placing objects
+maybe image or shapes to designate nodes? might need to look into other framework to draw the images? idk
+
+*/
 //in order of importance
 //TODO create test dialogue that makes sure all skillcheck and dialogue tree functionality is working
 //TODO clean up how dialogue is handled and retrieved so that it universally uses a path and maybe get rid of the extraneous current tree and current node variable

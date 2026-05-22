@@ -14,12 +14,15 @@ will need a minimum window size for both to make sure elements get placed proper
 camera needed for properly placing objects
 maybe image or shapes to designate nodes? might need to look into other framework to draw the images? idk
 
+
+make this the prototype of
 */
 //in order of importance
 //TODO create test dialogue that makes sure all skillcheck and dialogue tree functionality is working
 //TODO clean up how dialogue is handled and retrieved so that it universally uses a path and maybe get rid of the extraneous current tree and current node variable
 //TODO make an actual system for loading dialogue as data files
 //TODO allow an alternate mode that acts as an editor for dialogue to make testing
+pub mod appstate;
 pub mod dialogue;
 pub mod gamestate;
 mod init_gamestate;

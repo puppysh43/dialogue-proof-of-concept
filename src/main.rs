@@ -13,8 +13,10 @@ create a gui for both the gameplay interface and the editor
 will need a minimum window size for both to make sure elements get placed properly
 camera needed for properly placing objects
 maybe image or shapes to designate nodes? might need to look into other framework to draw the images? idk
+game will play in new popup window
+make dialogue node path
 
-
+will need to figure out how to keep track of both the files name to be displayed and the actual hard coded filename when doing save and loading
 make this the prototype of
 */
 //in order of importance
@@ -23,24 +25,36 @@ make this the prototype of
 //TODO make an actual system for loading dialogue as data files
 //TODO allow an alternate mode that acts as an editor for dialogue to make testing
 pub mod appstate;
+pub mod databundle;
 pub mod dialogue;
+pub mod editorstate;
 pub mod gamestate;
 mod init_gamestate;
 pub mod player;
 pub mod quest;
 pub mod skills;
+use appstate::AppState;
 use dialogue::*;
+use eframe::*;
 use fastrand;
 use gamestate::*;
-// use hecs::*;
+
 use std::env;
 use std::io;
 
 use crate::player::Player;
 
-fn main() {
-    let args: Vec<String> = env::args().collect();
-    let appstate = &args[1].trim();
+fn main() -> eframe::Result {
+    let options = eframe::NativeOptions {
+        viewport: egui::ViewportBuilder::default(),
+        ..Default::default()
+    };
+    eframe::run_native(
+        "Dialogue Toolkit",
+        options,
+        Box::new(|_cc| Ok(Box::<AppState>::default())),
+    )
+    /*
     match *appstate {
         "game" => {
             //run the game
@@ -62,9 +76,10 @@ fn main() {
         _ => {
             //print an error message and terminate the program.
         }
-    }
+    }*/
 }
 
+/*
 fn progress_tree(gamestate: &mut GameState) {
     //step through the dialogue tree depending on player choices.
     //check if there are worldstate changes that need to be run. this is done first for cases where ex. the result of a skillcheck
@@ -375,6 +390,7 @@ fn process_taskcheck(specs: TaskCheckSpecifications, player: Player) -> i32 {
     //return the difference between the roll and the check difficulty
     return roll - check_difficulty;
 }
+*/
 ///helper function that uses a random number generator to create a simulated d6 roll
 fn roll_d6() -> i32 {
     fastrand::i32(1..=6)

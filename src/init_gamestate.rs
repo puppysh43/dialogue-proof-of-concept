@@ -2,8 +2,8 @@ use crate::dialogue::*;
 use crate::gamestate::*;
 use crate::player::*;
 use crate::quest::*;
-use hecs::*;
 use std::collections::HashMap;
+/*
 pub fn init_gamestate() -> GameState {
     GameState {
         world: World::new(),
@@ -148,3 +148,4 @@ fn init_player() -> Player {
         HashMap::new(),
     )
 }
+*/

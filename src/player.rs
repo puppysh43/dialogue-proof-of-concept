@@ -6,6 +6,16 @@ pub struct Player {
     skills: Skills,
     inventory: HashMap<String, Item>,
 }
+impl Default for Player {
+    fn default() -> Self {
+        let inventory: HashMap<String, Item> = HashMap::new();
+        Player {
+            attributes: Attributes::new(8, 8, 8, 8, 8, 8),
+            skills: Skills::new(),
+            inventory,
+        }
+    }
+}
 impl Player {
     ///generates a new player, used on game initialization.
     pub fn new(attributes: Attributes, skills: Skills, inventory: HashMap<String, Item>) -> Player {

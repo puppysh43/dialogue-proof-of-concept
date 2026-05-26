@@ -8,6 +8,19 @@ CURRENT NOTES AND THOUGHTS
  - maybe make it so various functions take in string literals and turn them into strings so that all values passed in don't need to be appended with .to_string()
 */
 
+pub struct DialoguePath {
+    tree_name: String,
+    node_name: String,
+}
+impl DialoguePath {
+    pub fn new() -> Self {
+        DialoguePath {
+            tree_name: String::new(),
+            node_name: String::new(),
+        }
+    }
+}
+
 ///parent struct that contains all dialogue trees within the game. dialogue trees will be cloned out of the hashmap as needed
 #[derive(Clone, Debug)]
 pub struct DialogueDB {
@@ -87,8 +100,15 @@ pub struct QuestNodePath {
     node: String,
 }
 impl QuestNodePath {
-    ///creates a new
-    pub fn new(tree: String, node: String) -> QuestNodePath {
+    ///creates a new completely empty questnode path
+    pub fn new() -> Self {
+        QuestNodePath {
+            tree: String::new(),
+            node: String::new(),
+        }
+    }
+    ///creates a new questnode path from the given information
+    pub fn from(tree: String, node: String) -> QuestNodePath {
         QuestNodePath { tree, node }
     }
     pub fn path(&self) -> (String, String) {
@@ -304,7 +324,18 @@ pub struct DialogueNode {
     cnc: Option<CheckAndConsequences>,
 }
 impl DialogueNode {
-    ///Creates a new dialogue node.
+    ///creates a new, empty dialogue node
+    pub fn new() -> Self {
+        DialogueNode {
+            player_text: String::new(),
+            npc_text: String::new(),
+            parent_node: Vec::new(),
+            child_nodes: Vec::new(),
+            visibility_req: None,
+            cnc: None,
+        }
+    }
+    ///Creates a new dialogue node given specified data.
     ///player text: what the player is saying, this is used when displaying the childnode options.
     ///npc_text: what the npc is saying, this will display when the node has been chosen
     ///parent_node: the node that preceded this one. if empty it means it's the initial node
@@ -313,7 +344,7 @@ impl DialogueNode {
     ///seeing an option to say they're going to return a quest item when it is not in their inventory, or from seeing
     ///dialogue related to a quest they haven't progressed to yet.
     ///cnc: the "choice and consequences field" aka the list of various flags needed to parse out a choice/check
-    pub fn new(
+    pub fn from(
         player_text: String,
         npc_text: String,
         parent_node: Vec<String>,

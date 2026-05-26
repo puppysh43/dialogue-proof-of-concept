@@ -69,8 +69,16 @@ pub struct QuestNode {
     child_nodes: Vec<String>,
 }
 impl QuestNode {
+    ///makes a new completely empty questnode
+    pub fn new() -> Self {
+        QuestNode {
+            completed: false,
+            parent_nodes: Vec::new(),
+            child_nodes: Vec::new(),
+        }
+    }
     ///instantiates a new questnode. quest nodes always start out as false b/c they all need to be started and advanced by player actions.
-    pub fn new(parent_nodes: Vec<String>, child_nodes: Vec<String>) -> Self {
+    pub fn from(parent_nodes: Vec<String>, child_nodes: Vec<String>) -> Self {
         QuestNode {
             completed: false,
             parent_nodes,

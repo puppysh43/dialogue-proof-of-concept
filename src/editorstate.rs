@@ -30,6 +30,15 @@ impl EditorState {
             self.quest_db.clone(),
         )
     }
+    pub fn filename(&self) -> &str {
+        &self.filename
+    }
+    pub fn mut_filename(&mut self) -> &mut String {
+        &mut self.filename
+    }
+    pub fn update_filename(&mut self, new_name: String) {
+        self.filename = new_name;
+    }
 }
 pub struct DialogueBuffer {
     node: DialogueNode,

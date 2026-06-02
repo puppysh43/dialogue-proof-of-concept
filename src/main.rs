@@ -34,15 +34,7 @@ pub mod player;
 pub mod quest;
 pub mod skills;
 use appstate::AppState;
-use dialogue::*;
 use eframe::*;
-use fastrand;
-use gamestate::*;
-
-use std::env;
-use std::io;
-
-use crate::player::Player;
 
 fn main() -> eframe::Result {
     let options = eframe::NativeOptions {
@@ -391,6 +383,8 @@ fn process_taskcheck(specs: TaskCheckSpecifications, player: Player) -> i32 {
     return roll - check_difficulty;
 }
 */
+
+/*
 ///helper function that uses a random number generator to create a simulated d6 roll
 fn roll_d6() -> i32 {
     fastrand::i32(1..=6)
@@ -398,3 +392,4 @@ fn roll_d6() -> i32 {
 fn roll_2d6() -> i32 {
     fastrand::i32(1..=6) + fastrand::i32(1..=6)
 }
+*/

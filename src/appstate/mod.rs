@@ -1,14 +1,11 @@
 use crate::editorstate::EditorState;
 use crate::gamestate::GameState;
 use crate::player::Player;
-use eframe::wgpu::wgc::id::Id;
 use egui::*;
 mod tree;
 use crate::appstate::tree::Tree;
 mod ui;
 pub struct AppState {
-    ///tracks what the program is doing
-    appmode: AppMode,
     ///holds the data needed to edit the databundle
     editorstate: EditorState,
     ///data needed to play through the databundle as a "game"
@@ -18,6 +15,8 @@ pub struct AppState {
     //
     tree: Tree,
     menu_modal: MenuModal,
+    ///multi use string buffer to hold text entered by the user before sending it to the appropriate part of the program.
+    string_buffer: String,
 }
 
 impl Default for AppState {
@@ -28,6 +27,7 @@ impl Default for AppState {
             player_buffer: None,
             tree: Tree::new(),
             menu_modal: MenuModal::None,
+            string_buffer: String::new(),
         }
     }
 }

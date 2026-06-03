@@ -52,14 +52,18 @@ impl eframe::App for AppState {
                 //do nothing
             }
             MenuModal::Rename => {
-                Modal::new(egui::Id::new("RenameBundle")).show(ui.ctx(), |ui| {
+                Modal::new(egui::Id::new("RenameFile")).show(ui.ctx(), |ui| {
                     //put a textbox that updates the editorstate filename
                     ui.set_width(250.0);
-                    ui.heading("Rename Bundle");
-                    ui.label("Name Databundle:");
-                    ui.text_edit_singleline(self.editorstate.mut_filename());
+                    ui.heading("Rename File");
+                    ui.label("Name File:");
+                    ui.text_edit_singleline(&mut self.string_buffer);
                     //maybe switch over to like a buffer that gets sent to the editorstate once the
-                    // ui.button("Rename")
+                    if ui.button("Rename Current Project").clicked() {
+                        self.editorstate.update_filename(self.string_buffer.clone());
+                        self.menu_modal = MenuModal::None;
+                        ui.close();
+                    }
                     if ui.button("Close").clicked() {
                         self.menu_modal = MenuModal::None;
                         ui.close();
@@ -67,25 +71,53 @@ impl eframe::App for AppState {
                 });
             }
             MenuModal::New => {
-                //
+                Modal::new(egui::Id::new("NewFile")).show(ui.ctx(), |ui| {
+                    ui.heading("New File");
+                    ui.label("Name New File:");
+                    ui.text_edit_singleline(&mut self.string_buffer);
+                    if ui.button("New Project").clicked() {
+                        self.editorstate = EditorState::new();
+                        self.editorstate.update_filename(self.string_buffer.clone());
+                        self.menu_modal = MenuModal::None;
+                        ui.close();
+                    }
+                    if ui.button("Cancel").clicked() {
+                        self.menu_modal = MenuModal::None;
+                        ui.close();
+                    }
+                });
             }
             MenuModal::Load => {
-                //
+                //two options for this either have a custom file picker
+                Modal::new(egui::Id::new("LoadFile")).show(ui.ctx(), |ui| {
+                    ui.heading("Load File");
+                    ui.label("Select File to Load");
+                });
             }
             MenuModal::Save => {
-                //
+                Modal::new(egui::Id::new("SaveFile")).show(ui.ctx(), |ui| {
+                    ui.heading("Save File");
+                });
             }
             MenuModal::SaveAs => {
-                //
+                Modal::new(egui::Id::new("SaveFileAs")).show(ui.ctx(), |ui| {
+                    ui.heading("Save File As");
+                });
             }
             MenuModal::CharacterCreation => {
-                //
+                Modal::new(egui::Id::new("CharacterCreation")).show(ui.ctx(), |ui| {
+                    ui.heading("Character Creation");
+                });
             }
             MenuModal::Play => {
-                //
+                Modal::new(egui::Id::new("PlayFile")).show(ui.ctx(), |ui| {
+                    ui.heading("Play Project");
+                });
             }
             MenuModal::Quitting => {
-                //
+                Modal::new(egui::Id::new("Quitting")).show(ui.ctx(), |ui| {
+                    ui.heading("Quit Editor");
+                });
             }
         }
     }

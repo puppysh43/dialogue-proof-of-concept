@@ -2,7 +2,7 @@
 // #[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub struct Tree(Vec<Self>);
 #[derive(Clone, Copy, PartialEq)]
-enum Action {
+pub enum Action {
     Keep,
     Delete,
 }

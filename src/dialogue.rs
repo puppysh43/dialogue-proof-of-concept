@@ -1,5 +1,6 @@
 use crate::gamestate::*;
 use crate::player::*;
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 /*
@@ -22,7 +23,7 @@ impl DialoguePath {
 }
 
 ///parent struct that contains all dialogue trees within the game. dialogue trees will be cloned out of the hashmap as needed
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct DialogueDB {
     db: HashMap<String, DialogueTree>,
 }
@@ -55,7 +56,7 @@ impl DialogueDB {
     }
 }
 ///intermediate struct that contains the full dialogue tree for an NPC, interaction, or prompt
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct DialogueTree {
     ///the name of the NPC the dialogue tree "belongs to", will be displayed in the UI
     name: String,
@@ -92,7 +93,7 @@ impl DialogueTree {
     }
 }
 ///type used to specify a quest node with the tree name and node name
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct QuestNodePath {
     ///specifies the name of the quest tree needed
     tree: String,
@@ -122,7 +123,7 @@ impl QuestNodePath {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 ///flag that determines if a given dialogue node can be shown.
 pub enum VisibilityConditions {
     ///marks that a dialogue option can only be visible if the specified quest node is marked as completed
@@ -135,7 +136,7 @@ pub enum VisibilityConditions {
 ///used for choice and consequence reactivity in the RPG sense. the choice is the test that will be performed
 ///ex. (checking a quest stage, doing a skill check, checking for an item) and the consequences are event flags for worldstate changes
 ///to do based on the result of the choice
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct CheckAndConsequences {
     ///enum flag that tells the dialogue processing system what kind of checks need to be completed ex. skill check, checking a quest stage, faction reputation, etc
     check: CheckType,
@@ -158,7 +159,7 @@ impl CheckAndConsequences {
     }
 }
 ///the difficulty of a task check, translates into a target number that the character needs to roll at or over to succeed
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum CheckDifficulty {
     ///target number of 2 or more
     Simple,
@@ -192,7 +193,7 @@ impl CheckDifficulty {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum CheckResult {
     Success,
     Failure,
@@ -200,7 +201,7 @@ pub enum CheckResult {
 ///specifications used to tell what kind of skillcheck it is - what skill and/or attribute is being tested, and if item bonuses can be used. If no skilltype or attributetype is specified for the check
 ///it will do an agnostic skillcheck, essentially a random diceroll of average difficulty
 ///defined at creation and completely immutable after, will copy or clone out various fields as needed for the dialogue parsing and skillcheck system
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct TaskCheckSpecifications {
     ///if the test has a checkpoint option or not. most checks will have a bonus level at which no dice roll needs to be made (ex. if athletics lvl = 1 check automatically succeeds)
     ///if the checkpoint is NOT reached then the player can still attempt the check as a diceroll. Both attributes and skills can contribute to reaching the checkpoint
@@ -248,7 +249,7 @@ impl TaskCheckSpecifications {
     }
 }
 ///Flag for what kind of gamestate check is going to be performed by the dialogue node.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum CheckType {
     ///a task check, more commonly known in other games as a skill check. For more details on what exactly this entails see the documentation for TaskCheckSpecifications.
     TaskCheck(TaskCheckSpecifications),
@@ -259,7 +260,7 @@ pub enum CheckType {
 }
 ///container for a vec of consequences for both success and failure (ex. when making a strength check to move a boulder, success clears the boulder and changes the associated quest
 ///so the play can pass through, on failure the character takes damage) Also contains the ID of the node in the quest tree that a success or failure will send you to.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Consequences {
     ///contains a vector of variable size of consequences (gamestate changes) to be processed when the player succeeds the check as well as the ID of the dialogue node to route to depending on results
     success: (Vec<Consequence>, String),
@@ -284,7 +285,7 @@ impl Consequences {
     }
 }
 ///event flag to tell the game what gamestate changes to make based on the result of the choice/check.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum Consequence {
     ///damage the player by the amount specified
     DamagePlayer(i32),
@@ -306,7 +307,7 @@ pub enum Consequence {
 ///the text printed to the screen, as well as gameplay features; a requirement for visibility, a worldstate check
 ///(such as a skillcheck, checking quest flags, or checking for an item in the player's inventory), and a worldstate change
 ///(editing the inventory of a character, changing a questflag, dealing damage, etc)
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DialogueNode {
     ///what the player is saying, this is used when displaying the childnode options.
     player_text: String,

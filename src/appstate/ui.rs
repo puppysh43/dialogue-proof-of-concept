@@ -1,4 +1,7 @@
-use crate::appstate::*;
+use serde_json::to_string;
+use std::path::Path;
+
+use crate::{appstate::*, databundle::Databundle};
 impl eframe::App for AppState {
     //first render the ui for the editor layer using the editor state data. this will always be rendered
     //and is the "base window" of the application, the same way the editor of an IDE is always open
@@ -29,7 +32,6 @@ impl eframe::App for AppState {
                     }
                     if ui.button("Quit").clicked() {
                         self.menu_modal = MenuModal::Quitting;
-                        // ui.send_viewport_cmd(egui::ViewportCommand::Close);
                     }
                 });
             });
@@ -54,17 +56,19 @@ impl eframe::App for AppState {
             MenuModal::Rename => {
                 Modal::new(egui::Id::new("RenameFile")).show(ui.ctx(), |ui| {
                     //put a textbox that updates the editorstate filename
-                    ui.set_width(250.0);
+                    // ui.set_width(250.0);
                     ui.heading("Rename File");
                     ui.label("Name File:");
                     ui.text_edit_singleline(&mut self.string_buffer);
                     //maybe switch over to like a buffer that gets sent to the editorstate once the
                     if ui.button("Rename Current Project").clicked() {
                         self.editorstate.update_filename(self.string_buffer.clone());
+                        self.string_buffer.clear();
                         self.menu_modal = MenuModal::None;
                         ui.close();
                     }
                     if ui.button("Close").clicked() {
+                        self.string_buffer.clear();
                         self.menu_modal = MenuModal::None;
                         ui.close();
                     }
@@ -79,37 +83,75 @@ impl eframe::App for AppState {
                         self.editorstate = EditorState::new();
                         self.editorstate.update_filename(self.string_buffer.clone());
                         self.menu_modal = MenuModal::None;
+                        self.string_buffer.clear();
                         ui.close();
                     }
                     if ui.button("Cancel").clicked() {
+                        self.string_buffer.clear();
                         self.menu_modal = MenuModal::None;
                         ui.close();
                     }
                 });
             }
             MenuModal::Load => {
+                //TODO
                 //two options for this either have a custom file picker
                 Modal::new(egui::Id::new("LoadFile")).show(ui.ctx(), |ui| {
                     ui.heading("Load File");
                     ui.label("Select File to Load");
+                    let mut loaded_filename = String::new();
+                    if self.path_buffer.is_some() {
+                        let selected_file: Databundle = serde_json::from_str(
+                            &std::fs::read_to_string(self.path_buffer.clone().unwrap().as_path())
+                                .unwrap(),
+                        )
+                        .unwrap();
+                        loaded_filename = selected_file.name();
+                    }
+                    //might need to give uuid's to editor states or at least saves so that they can be distinguished.
+                    //or just use the path??
+                    // will read through the saves directory for files
+                    egui::ComboBox::from_label("Select File to Load")
+                        .selected_text(format!("{:?}", loaded_filename))
+                        .show_ui(ui, |ui| {
+                            //
+                            for entry in std::fs::read_dir(Path::new("./saves/")).unwrap() {
+                                //
+                            }
+                        });
                 });
             }
             MenuModal::Save => {
                 Modal::new(egui::Id::new("SaveFile")).show(ui.ctx(), |ui| {
+                    //do the saving
+                    std::fs::write(
+                        Path::new(&format!("./saves/{}", self.editorstate.filename())),
+                        serde_json::to_string_pretty(&self.editorstate.export_databundle())
+                            .unwrap(),
+                    );
                     ui.heading("Save File");
+                    ui.label("Project has been saved!");
+                    if ui.button("Ok").clicked() {
+                        self.menu_modal = MenuModal::None;
+                        ui.close();
+                    }
                 });
             }
             MenuModal::SaveAs => {
                 Modal::new(egui::Id::new("SaveFileAs")).show(ui.ctx(), |ui| {
                     ui.heading("Save File As");
+                    ui.label("Save File As:");
+                    ui.text_edit_singleline(&mut self.string_buffer);
                 });
             }
             MenuModal::CharacterCreation => {
+                //TODO
                 Modal::new(egui::Id::new("CharacterCreation")).show(ui.ctx(), |ui| {
                     ui.heading("Character Creation");
                 });
             }
             MenuModal::Play => {
+                //TODO
                 Modal::new(egui::Id::new("PlayFile")).show(ui.ctx(), |ui| {
                     ui.heading("Play Project");
                 });
@@ -117,6 +159,14 @@ impl eframe::App for AppState {
             MenuModal::Quitting => {
                 Modal::new(egui::Id::new("Quitting")).show(ui.ctx(), |ui| {
                     ui.heading("Quit Editor");
+                    ui.label("Are you sure you want to quit? All unsaved data will be lost.");
+                    if ui.button("Yes").clicked() {
+                        ui.send_viewport_cmd(egui::ViewportCommand::Close);
+                    }
+                    if ui.button("Cancel").clicked() {
+                        self.menu_modal = MenuModal::None;
+                        ui.close();
+                    }
                 });
             }
         }

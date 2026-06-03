@@ -1,6 +1,7 @@
-///all player information needed for proof of concept and basic testing of functionality. maybe will make configurable via config file.
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 #[derive(Clone, Debug)]
+///all player information needed for proof of concept and basic testing of functionality. maybe will make configurable via config file.
 pub struct Player {
     attributes: Attributes,
     skills: Skills,
@@ -47,7 +48,7 @@ impl Player {
 }
 
 ///enum used for specifying the attribute in various functions.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum AttributeType {
     Strength,
     Dexterity,
@@ -191,7 +192,7 @@ impl Skills {
 }
 
 ///enum for specifying which character skill is needed in various functions
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum SkillType {
     Speech,
     Stealth,
@@ -201,7 +202,7 @@ pub enum SkillType {
 }
 
 ///very simple item implementation currently only used to test quest mcguffins i.e. keycards, fetch quests, etc.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Item {
     name: String,
 }

@@ -1,6 +1,8 @@
 use crate::dialogue::DialogueDB;
 use crate::quest::QuestDB;
+use serde::{Deserialize, Serialize};
 //databundle, this is a generic datatype that ferries necessary information between various parts of the program
+#[derive(Serialize, Deserialize)]
 pub struct Databundle {
     dialogue_db: DialogueDB,
     name: String,
@@ -27,5 +29,8 @@ impl Databundle {
             self.dialogue_db.clone(),
             self.quest_db.clone(),
         )
+    }
+    pub fn name(&self) -> String {
+        self.name.clone()
     }
 }

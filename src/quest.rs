@@ -1,9 +1,10 @@
 /*
 quest tree database structs
 */
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 ///highest level "container" of all quest trees in the game
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct QuestDB {
     db: HashMap<String, QuestTree>,
 }
@@ -26,7 +27,7 @@ impl QuestDB {
 }
 //
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct QuestTree {
     ///quest name
     name: String,
@@ -62,7 +63,7 @@ impl QuestTree {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct QuestNode {
     completed: bool,
     parent_nodes: Vec<String>,

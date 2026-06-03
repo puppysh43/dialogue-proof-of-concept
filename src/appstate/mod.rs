@@ -2,6 +2,7 @@ use crate::editorstate::EditorState;
 use crate::gamestate::GameState;
 use crate::player::Player;
 use egui::*;
+use std::path::PathBuf;
 mod tree;
 use crate::appstate::tree::Tree;
 mod ui;
@@ -12,7 +13,7 @@ pub struct AppState {
     gamestate: GameState,
     ///buffer that holds the player data as it is entered during "character creation" before a "game" is launched
     player_buffer: Option<Player>,
-    //
+    path_buffer: Option<PathBuf>,
     tree: Tree,
     menu_modal: MenuModal,
     ///multi use string buffer to hold text entered by the user before sending it to the appropriate part of the program.
@@ -25,6 +26,7 @@ impl Default for AppState {
             editorstate: EditorState::new(),
             gamestate: GameState::new(),
             player_buffer: None,
+            path_buffer: None,
             tree: Tree::new(),
             menu_modal: MenuModal::None,
             string_buffer: String::new(),

@@ -1,6 +1,10 @@
 use serde_json::to_string;
 use std::path::Path;
 
+//TODO all file management stuff will be added LATER. right now use the crate_dir variable to just use a single
+//datafile. use the library rfd for handling it later and have actual support for putting data files in the right place in the
+//operating system. this is not necessary for an editor proof of concept
+
 use crate::{appstate::*, databundle::Databundle};
 impl eframe::App for AppState {
     //first render the ui for the editor layer using the editor state data. this will always be rendered
@@ -75,6 +79,7 @@ impl eframe::App for AppState {
                 });
             }
             MenuModal::New => {
+                //right now this will just clear the data and allow a new name to be selected
                 Modal::new(egui::Id::new("NewFile")).show(ui.ctx(), |ui| {
                     ui.heading("New File");
                     ui.label("Name New File:");
@@ -94,9 +99,10 @@ impl eframe::App for AppState {
                 });
             }
             MenuModal::Load => {
-                //TODO
-                //two options for this either have a custom file picker
+                //TODO implement this fully later. right now all it needs to do is grab
+                //the dev testing save file in the preset location
                 Modal::new(egui::Id::new("LoadFile")).show(ui.ctx(), |ui| {
+                    /*
                     ui.heading("Load File");
                     ui.label("Select File to Load");
                     let mut loaded_filename = String::new();
@@ -119,11 +125,15 @@ impl eframe::App for AppState {
                                 //
                             }
                         });
+                        */
                 });
             }
             MenuModal::Save => {
                 Modal::new(egui::Id::new("SaveFile")).show(ui.ctx(), |ui| {
                     //do the saving
+                    //TODO maybe eventually add custom saving etc etc but rn just save automatically
+                    //to the same file
+                    /*
                     std::fs::write(
                         Path::new(&format!("./saves/{}", self.editorstate.filename())),
                         serde_json::to_string_pretty(&self.editorstate.export_databundle())
@@ -134,10 +144,11 @@ impl eframe::App for AppState {
                     if ui.button("Ok").clicked() {
                         self.menu_modal = MenuModal::None;
                         ui.close();
-                    }
+                    }*/
                 });
             }
             MenuModal::SaveAs => {
+                //implement later
                 Modal::new(egui::Id::new("SaveFileAs")).show(ui.ctx(), |ui| {
                     ui.heading("Save File As");
                     ui.label("Save File As:");
